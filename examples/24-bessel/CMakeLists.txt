@@ -1,6 +1,6 @@
 IF(COMPLEX)
 
-project(bessel)
+project(run)
 
 # use the complex version of the library:
 set(HERMES ${HERMES_CPLX_BIN})
