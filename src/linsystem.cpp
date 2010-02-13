@@ -561,7 +561,10 @@ void LinSystem::assemble(bool rhsonly)
             for (j = 0; j < an->cnt; j++) {
               fu->set_active_shape(an->idx[j]);
               bi = eval_form(bfv, fu, fv, refmap+n, refmap+m) * an->coef[j] * am->coef[i];
-              if (an->dof[j] < 0) Dir[k] -= bi; else mat[i][j] = bi;
+              // result is considered only if greater than 1e-12 in magnitude
+              if(fabs(bi) > 1e-12) {
+                if (an->dof[j] < 0) Dir[k] -= bi; else mat[i][j] = bi;
+              }
             }
           }
           else // symmetric block
@@ -570,7 +573,10 @@ void LinSystem::assemble(bool rhsonly)
               if (j < i && an->dof[j] >= 0) continue;
               fu->set_active_shape(an->idx[j]);
               bi = eval_form(bfv, fu, fv, refmap+n, refmap+m) * an->coef[j] * am->coef[i];
-              if (an->dof[j] < 0) Dir[k] -= bi; else mat[i][j] = mat[j][i] = bi;
+              // result is considered only if greater than 1e-12 in magnitude
+              if(fabs(bi) > 1e-12) {
+                if (an->dof[j] < 0) Dir[k] -= bi; else mat[i][j] = mat[j][i] = bi;
+              }
             }
           }
         }
@@ -607,8 +613,12 @@ void LinSystem::assemble(bool rhsonly)
           if (am->dof[i] < 0) continue;
           fv->set_active_shape(am->idx[i]);
           double b = RHS[am->dof[i]];
-          RHS[am->dof[i]] += eval_form(lfv, fv, refmap+m) * am->coef[i];
-          b -= RHS[am->dof[i]];
+          // result is considered only if greater than 1e-12 in magnitude
+          double val = eval_form(lfv, fv, refmap+m) * am->coef[i];
+          if (fabs(val) > 1e-12) {
+            RHS[am->dof[i]] += val;
+            b -= RHS[am->dof[i]];
+          }
           //printf("RHS[%d] += %f\n", am->dof[i], b);
         }
       }
@@ -687,8 +697,11 @@ void LinSystem::assemble(bool rhsonly)
 			e0->vn[3]->id
 			);
             */
+              // result is considered only if greater than 1e-12 in magnitude
               bi = eval_form(bfs, fu, fv, refmap+n, refmap+m, &(ep[edge])) * an->coef[j] * am->coef[i];
-              if (an->dof[j] >= 0) mat[i][j] = bi; else Dir[k] -= bi;
+              if (fabs(bi) > 1e-12) {
+                if (an->dof[j] >= 0) mat[i][j] = bi; else Dir[k] -= bi;
+              }
             }
           }
           insert_block(mat, am->dof, an->dof, am->cnt, an->cnt);
@@ -727,8 +740,12 @@ void LinSystem::assemble(bool rhsonly)
             if (am->dof[i] < 0) continue;
             fv->set_active_shape(am->idx[i]);
             double b= RHS[am->dof[i]];
-            RHS[am->dof[i]] += eval_form(lfs, fv, refmap+m, ep+edge) * am->coef[i];
-            b = RHS[am->dof[i]]-b;
+            // result is considered only if greater than 1e-12 in magnitude
+            double val = eval_form(lfs, fv, refmap+m, ep+edge) * am->coef[i];
+            if (fabs(val) > 1e-12) {
+              RHS[am->dof[i]] += val;
+              b = RHS[am->dof[i]]-b;
+            }
           //printf("surface RHS[%d] += %f\n", am->dof[i], b);
           }
         }

@@ -232,11 +232,11 @@ int main(int argc, char* argv[])
     // assemble and solve
     Solution w0_sln, w1_sln, w3_sln, w4_sln;
     sys.assemble();
-    //insert_object("sys", LinSystem_from_C(&sys));
+    insert_object("sys", LinSystem_from_C(&sys));
     cmd("import util");
-    //cmd("util.run(sys)");
+    cmd("util.run(sys)");
     sys.solve(4, &w0_sln, &w1_sln, &w3_sln, &w4_sln);
-    //error("stop");
+    error("stop");
 
     // visualization
     //sprintf(title, "Current density, time %g", TIME);

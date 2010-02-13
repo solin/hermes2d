@@ -8,9 +8,10 @@ from numpy.linalg import solve
 from numpy import arange, array, dot
 
 def run(sys):
-    A = sys.get_matrix().todense()
+    A = sys.get_matrix()
     rhs = sys.get_rhs()
     print A
+    stop
     print "-"*70
     print "rhs", rhs
     #x = array([
