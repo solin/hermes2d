@@ -118,11 +118,13 @@ int main(int argc, char* argv[])
   // load the mesh file
   Mesh mesh;
   //mesh.load("quad-diag.mesh");
-  H2DReader mloader;
+  ExodusIIReader mloader;
   //mloader.load("domain-quad.mesh", &mesh);
   //mloader.load("channel.mesh", &mesh);
-  mloader.load("GAMM-channel.mesh", &mesh);
+  //mloader.load("GAMM-channel.mesh", &mesh);
+  mloader.load("gamm.e", &mesh);
 
+  /*
   // a-priori mesh refinements
   //mesh.refine_all_elements();
   mesh.refine_element(1, 2);
@@ -144,6 +146,7 @@ int main(int argc, char* argv[])
   //mesh.refine_towards_vertex(2, 5);
   //mesh.refine_all_elements();
   //mesh.refine_towards_boundary(marker_bottom, 3);
+  */
 
   // display the mesh
   //MeshView mview("Navier-Stokes Example - Mesh", 100, 100, 1100, 400);
@@ -182,14 +185,14 @@ int main(int argc, char* argv[])
   register_forms(wf, w0_prev, w1_prev, w3_prev, w4_prev);
 
   // visualization
-  VectorView w13_view("Current Density [m/s]", 0, 0, 1500, 470);
-  ScalarView w0_view("Mass Density [Pa]", 1530, 0, 1500, 470);
-  ScalarView w4_view("Energy [Pa]", 1530, 530, 1500, 470);
-  ScalarView u_view("u", 0, 530, 1500, 470);
-  ScalarView w_view("w", 0, 1060, 1500, 470);
+  //VectorView w13_view("Current Density [m/s]", 0, 0, 1000, 470);
+  ScalarView w0_view("density [Pa]", 1530, 0, 1000, 470);
+  //ScalarView w4_view("Energy [Pa]", 1530, 530, 1000, 470);
+  ScalarView u_view("x-velocity", 0, 530, 1000, 470);
+  ScalarView w_view("y-velovity", 0, 1060, 1000, 470);
   //w13_view.set_min_max_range(0, 2);
   w0_view.show_mesh(false);
-  w4_view.show_mesh(false);
+  //w4_view.show_mesh(false);
   // fixing scale width (for nicer videos). Note: creation of videos is
   // discussed in a separate example
   //vview.fix_scale_width(5);
@@ -236,21 +239,21 @@ int main(int argc, char* argv[])
     //error("stop");
 
     // visualization
-    sprintf(title, "Current density, time %g", TIME);
-    w13_view.set_title(title);
-    w13_view.show(&w1_prev, &w3_prev, EPS_LOW);
-    sprintf(title, "Mass Density, time %g", TIME);
+    //sprintf(title, "Current density, time %g", TIME);
+    //w13_view.set_title(title);
+    //w13_view.show(&w1_prev, &w3_prev, EPS_LOW);
+    sprintf(title, "density, time %g", TIME);
     w0_view.set_title(title);
     w0_view.show(&w0_sln);
-    sprintf(title, "Energy, time %g", TIME);
+    //sprintf(title, "Energy, time %g", TIME);
     //CalcPressure pressure(&w0_sln, &w1_sln, &w3_sln, &w4_sln);
     Calc_u u(&w0_sln, &w1_sln, &w3_sln, &w4_sln);
     Calc_w w(&w0_sln, &w1_sln, &w3_sln, &w4_sln);
     //printf("energy at 0,0: %.15f\n", w4_sln.get_pt_value(0, 0));
 
-    w4_view.set_title(title);
+    //w4_view.set_title(title);
     //w4_view.show(&pressure);
-    w4_view.show(&w4_sln);
+    //w4_view.show(&w4_sln);
 
     u_view.show(&u);
     w_view.show(&w);

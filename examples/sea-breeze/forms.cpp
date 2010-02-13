@@ -3,7 +3,7 @@
 
 #include "_hermes2d_api.h"
 
-const double TAU = 3e-5;  // this is in seconds
+const double TAU = 3e-5 / t_r;  // this is in seconds
 
 const double T_0 = T_z(0);
 const double p_0 = p_z(0);
