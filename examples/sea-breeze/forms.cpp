@@ -3,7 +3,7 @@
 
 #include "_hermes2d_api.h"
 
-const double TAU = 1e-5;  // this is in seconds
+const double TAU = 3e-5;  // this is in seconds
 
 const double T_0 = T_z(0);
 const double p_0 = p_z(0);
@@ -45,7 +45,7 @@ scalar w0_init(double x, double y, scalar& dx, scalar& dy) {
     dx = 0;
     dy = 0;
     //w0_init_num = rho_z(0)/rho_r;
-    w0_init_num = 1;
+    w0_init_num = 1 / rho_r;
     return w0_init_num;
 }
 
@@ -53,7 +53,7 @@ scalar w1_init(double x, double y, scalar& dx, scalar& dy) {
     dx = 0;
     dy = 0;
     //w1_init_num = rho_z(0)/rho_r * (20/u_r);
-    w1_init_num = 50;
+    w1_init_num = 50 / u_r;
     return w1_init_num;
 }
 
@@ -61,7 +61,7 @@ scalar w3_init(double x, double y, scalar& dx, scalar& dy) {
     dx = 0;
     dy = 0;
     //w3_init_num = rho_z(0)/rho_r * (0/u_r);
-    w3_init_num = 0;
+    w3_init_num = 0 / u_r;
     return w3_init_num;
 }
 
@@ -70,7 +70,7 @@ scalar w4_init(double x, double y, scalar& dx, scalar& dy) {
     dx = 0;
     dy = 0;
     //w4_init_num = rho_z(0) * T_z(0) * c_v / E_r;
-    w4_init_num = 1e5;
+    w4_init_num = 1e5 / E_r;
     p_init_num = R/c_v * (w4_init_num - (w1_init_num*w1_init_num +
                 w3_init_num*w3_init_num)/(2*w0_init_num));
     return w4_init_num;
