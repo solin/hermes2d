@@ -150,29 +150,13 @@ int main(int argc, char* argv[])
   //mview.show(&mesh);
   //mview.wait_for_keypress();
 
-  // initialize the shapesets and the cache
-  H1Shapeset shapeset_h1;
-  PrecalcShapeset pss_h1(&shapeset_h1);
-
-#define L2
-
-  // this should be L2Shapeset, but hermes complains...
-#ifdef L2
   L2Shapeset shapeset_l2;
-#else
-  H1Shapeset shapeset_l2;
-#endif
   PrecalcShapeset pss_l2(&shapeset_l2);
 
-  // H1 spaces for velocities and L2 for pressure
   L2Space s0(&mesh, &shapeset_l2);
   L2Space s1(&mesh, &shapeset_l2);
   L2Space s3(&mesh, &shapeset_l2);
-#ifdef L2
   L2Space s4(&mesh, &shapeset_l2);
-#else
-  H1Space s4(&mesh, &shapeset_l2);
-#endif
 
   register_bc(s0, s1, s3, s4);
 
