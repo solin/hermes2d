@@ -14,6 +14,8 @@ pss = PrecalcShapeset(shapeset)
 # create an H1 space
 space = H1Space(mesh, shapeset)
 space.set_uniform_order(5)
+from hermes2d.examples.c03 import set_bc
+set_bc(space)
 space.assign_dofs()
 
 # initialize the discrete problem
@@ -26,13 +28,17 @@ sys.set_spaces(space)
 sys.set_pss(pss)
 
 # assemble the stiffness matrix and solve the system
-sys.assemble()
-A = sys.get_matrix()
-b = sys.get_rhs()
-from scipy.sparse.linalg import cg
-x, res = cg(A, b)
 sln = Solution()
-sln.set_fe_solution(space, pss, x)
+sys.assemble()
+sys.solve_system(sln)
+
+#sys.assemble()
+#A = sys.get_matrix()
+#b = sys.get_rhs()
+#from scipy.sparse.linalg import cg
+#x, res = cg(A, b)
+#sln = Solution()
+#sln.set_fe_solution(space, pss, x)
 
 view = ScalarView("Solution")
 view.show(sln, lib="mayavi")
@@ -41,3 +47,5 @@ view.show(sln, lib="mayavi")
 mview = MeshView("Hello world!", 100, 100, 500, 500)
 mview.show(mesh, lib="mpl", method="orders", notebook=False)
 mview.wait()
+
+
