@@ -3,13 +3,11 @@
 #define H2D_REPORT_VERBOSE
 #define H2D_REPORT_FILE "application.log"
 #include "hermes2d.h"
-#include "solver_umfpack.h"
 
 //  The purpose of this example is to show how to use Trilinos
 //  for linear PDE problems. It compares performance of the LinSystem 
-//  class in Hermes using the UMFpack matrix solver with the performance
-//  of the Trilinos NOX solver (using Newton's method or JFNK, with or 
-//  without preconditioning).
+//  class in Hermes with the performance of the Trilinos NOX solver 
+//  (using Newton's method or JFNK, with or without preconditioning).
 //
 //  PDE: Poisson equation.
 //
@@ -72,13 +70,10 @@ int main(int argc, char **argv)
   // Solutions.
   Solution prev, sln1, sln2;
 
-  info("---- Using LinSystem, solving by UMFpack:");
+  info("---- Using LinSystem:");
 
   // Time measurement.
   cpu_time.tick(H2D_SKIP);
-
-  // Matrix solver.
-  UmfpackSolver umfpack;
 
   // Initialize weak formulation.
   WeakForm wf1;
@@ -86,15 +81,15 @@ int main(int argc, char **argv)
   wf1.add_vector_form(callback(linear_form));
 
   // Initialize the linear system.
-  LinSystem ls(&wf1, &umfpack, &space);
+  LinSystem ls(&wf1, &space);
 
   // Assemble and solve.
-  info("Assembling by LinSystem, solving by UMFpack.");
+  info("Assembling by LinSystem.");
   ls.assemble();
   ls.solve(&sln1);
 
-  // CPU time needed by UMFpack.
-  double umf_time = cpu_time.tick().last();
+  // CPU time.
+  double solver_time = cpu_time.tick().last();
 
   info("---- Using FeProblem, solving by NOX:");
 
@@ -163,8 +158,8 @@ int main(int argc, char **argv)
   // Calculate exact errors.
   Solution ex;
   ex.set_exact(&mesh, &exact);
-  info("Solution 1 (LinSystem - UMFpack): exact H1 error: %g (time %g s)", 
-    100 * h1_error(&sln1, &ex), umf_time);
+  info("Solution 1 (LinSystem): exact H1 error: %g (time %g s)", 
+    100 * h1_error(&sln1, &ex), solver_time);
   info("Solution 2 (FeProblem - NOX):  exact H1 error: %g (time %g + %g s)", 
     100 * h1_error(&sln2, &ex), proj_time, nox_time);
 

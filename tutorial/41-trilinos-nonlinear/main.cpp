@@ -3,12 +3,11 @@
 #define H2D_REPORT_VERBOSE
 #define H2D_REPORT_FILE "application.log"
 #include "hermes2d.h"
-#include "solver_umfpack.h"
 
 //  The purpose of this example is to show how to use Trilinos for nonlinear PDE problems. It 
-//  compares performance of The Newton's method in the NonlinSystem class in Hermes (using the 
-//  Umfpack solver) with the performance of the Trilinos/NOX solver (using the Newton's method 
-//  or JFNK, and with or without preconditioning).
+//  compares performance of The Newton's method in the NonlinSystem class in Hermes with the 
+//  performance of the Trilinos/NOX solver (using the Newton's method or JFNK, and with or 
+//  without preconditioning).
 //
 //  PDE:  - \nabla (k \nabla u) = f
 //  k = (1 + sqr(u_x) + sqr(u_y))^{-0.5}
@@ -67,13 +66,10 @@ int main(int argc, char* argv[])
   H1Space space(&mesh, bc_types, NULL, P_INIT);
   info("Number of DOF: %d",  space.get_num_dofs());
 
-  info("---- Using NonlinSystem, solving by Umfpack:");
+  info("---- Using NonlinSystem:");
 
   // Time measurement.
   cpu_time.tick(H2D_SKIP);
-  
-  // Matrix solver,
-  UmfpackSolver umfpack;
 
   // Define zero function on the mesh
   prev.set_zero(&mesh);
@@ -84,7 +80,7 @@ int main(int argc, char* argv[])
   wf1.add_vector_form(callback(residual_form_hermes), H2D_ANY, &prev);
 
   // Initialize NonlinSystem,
-  NonlinSystem nls(&wf1, &umfpack, &space);
+  NonlinSystem nls(&wf1, &space);
 
   // Project the function "prev" on the FE space "space".
   info("Projecting initial condition on the FE space.");
@@ -95,18 +91,18 @@ int main(int argc, char* argv[])
   if (!nls.solve_newton(&prev, NEWTON_TOL, NEWTON_MAX_ITER)) 
     error("Newton's method did not converge.");
 
-  // Storing the solution in "sln1"
+  // Storing the solution in "sln1".
   sln1.copy(&prev);
 
-  // CPU time needed by UMFpack
-  double umf_time = cpu_time.tick().last();
+  // CPU time.
+  double solver_time = cpu_time.tick().last();
 
   info("---- Using FeProblem, solving by NOX:");
 
   // Time measurement.
   cpu_time.tick(H2D_SKIP);
  
-  // Define zero function (again)
+  // Define zero function (again).
   prev.set_zero(&mesh);
 
   // Project the function "prev" on the FE space 
@@ -167,8 +163,8 @@ int main(int argc, char* argv[])
   // Calculate exact errors.
   Solution ex;
   ex.set_exact(&mesh, &exact);
-  info("Solution 1 (NonlinSystem - UMFpack): exact H1 error: %g (time %g s)", 
-    100 * h1_error(&sln1, &ex), umf_time);
+  info("Solution 1 (NonlinSystem): exact H1 error: %g (time %g s)", 
+    100 * h1_error(&sln1, &ex), solver_time);
   info("Solution 2 (FeProblem - NOX):  exact H1 error: %g (time %g + %g s)", 
     100 * h1_error(&sln2, &ex), proj_time, nox_time);
 
